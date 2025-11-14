@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pathly - Location Finder</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="config.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📍 Pathly</h1>
+            <p class="subtitle">Find points of interest along your route</p>
+        </header>
+
+        <main>
+            <div class="location-card">
+                <!-- Input Section -->
+                <div class="input-section">
+                    <div class="input-hint">
+                        <span class="hint-icon">💡</span>
+                        <p>Try: <strong>"Find me an Indian restaurant on my way to Delaware"</strong></p>
+                    </div>
+                    
+                    <div class="input-container">
+                        <input 
+                            type="text" 
+                            id="textInput" 
+                            class="text-input" 
+                            placeholder="Find me a [place] on my way to [destination]"
+                        />
+                        <button id="voiceBtn" class="btn-voice" title="Voice Input">
+                            <span class="voice-icon">🎤</span>
+                        </button>
+                        <button id="submitBtn" class="btn-submit">
+                            Search
+                        </button>
+                    </div>
+                    
+                    <div id="voiceStatus" class="voice-status hidden">
+                        <span class="pulse-dot"></span>
+                        <span>Listening...</span>
+                    </div>
+                </div>
+
+                <div id="status" class="status-message"></div>
+                
+                <!-- Parsed Variables Display -->
+                <div id="parsedInfo" class="parsed-info hidden">
+                    <h3>Search Details</h3>
+                    <div class="parsed-grid">
+                        <div class="parsed-item">
+                            <label>Adjective:</label>
+                            <span id="adjective">-</span>
+                        </div>
+                        <div class="parsed-item">
+                            <label>Place Type:</label>
+                            <span id="placeType">-</span>
+                        </div>
+                        <div class="parsed-item">
+                            <label>Destination:</label>
+                            <span id="destination">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="locationInfo" class="location-info hidden">
+                    <h2>📍 Your Current Location</h2>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <label>Latitude:</label>
+                            <span id="latitude">-</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Longitude:</label>
+                            <span id="longitude">-</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Accuracy:</label>
+                            <span id="accuracy">-</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Timestamp:</label>
+                            <span id="timestamp">-</span>
+                        </div>
+                    </div>
+                    <div id="mapContainer" class="map-container">
+                        <div id="map" class="map"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>
+
