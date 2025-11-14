@@ -38,11 +38,22 @@ GOOGLE_MAPS_API_KEY=your-google-maps-api-key-here
    - Start the server (`npm start`)
 3. Wait for deployment to complete (~5-10 minutes first time)
 
-### 6. Update Frontend Config
+### 6. Create config.js on Render
 After deployment, you'll get a URL like `https://pathly-xxxx.onrender.com`
 
-1. Update `config.js` with your Supabase keys (these are safe - they're public keys)
-2. The app will automatically use the same origin for API calls in production
+**Important:** You need to create `config.js` file on Render's file system:
+1. Go to your Render service dashboard
+2. Click on "Shell" tab (or use SSH)
+3. Create `config.js` file with your Supabase keys:
+   ```javascript
+   const SUPABASE_URL = 'your-supabase-url';
+   const SUPABASE_ANON_KEY = 'your-supabase-anon-key';
+   const GOOGLE_MAPS_API_KEY = 'your-google-maps-api-key';
+   ```
+
+**Alternative:** You can also add these as environment variables and create config.js during build (see advanced setup below).
+
+The app will automatically use the same origin for API calls in production.
 
 ## How It Works
 

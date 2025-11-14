@@ -565,6 +565,13 @@ if (process.env.NODE_ENV === 'production') {
     const distPath = join(__dirname, 'dist');
     app.use(express.static(distPath));
     
+    // Also serve config.js from root (for runtime loading)
+    app.get('/config.js', (req, res) => {
+        const configPath = join(__dirname, 'config.js');
+        res.type('application/javascript');
+        res.sendFile(configPath);
+    });
+    
     // Serve index.html for all non-API routes
     app.get('*', (req, res, next) => {
         // Don't serve index.html for API routes

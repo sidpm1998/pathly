@@ -19,7 +19,9 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: undefined
-      }
-    }
+      },
+      external: ['config.js'] // Don't bundle config.js - it will be loaded at runtime
+    },
+    copyPublicDir: true
   }
 });
