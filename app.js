@@ -51,18 +51,14 @@ let recognition = null;
 let isListening = false;
 let autoProcessTimeout = null;
 
-// Check API keys
+// Check API keys (only Supabase needed in frontend now)
 function checkAPIKeys() {
-    if (typeof ELEVENLABS_API_KEY === 'undefined' || ELEVENLABS_API_KEY === 'YOUR_ELEVENLABS_API_KEY_HERE') {
-        console.warn('ElevenLabs API key not configured');
+    // Only need to check Supabase - OpenAI is handled by backend
+    if (typeof SUPABASE_URL === 'undefined' || typeof SUPABASE_ANON_KEY === 'undefined' ||
+        SUPABASE_URL === 'YOUR_SUPABASE_URL_HERE' || SUPABASE_ANON_KEY === 'YOUR_ANON_KEY_HERE') {
+        console.warn('Supabase not configured');
     }
-    if (typeof OPENAI_API_KEY === 'undefined' || OPENAI_API_KEY === 'YOUR_OPENAI_API_KEY_HERE') {
-        showStatus('OpenAI API key not configured. Please add it to config.js', 'error');
-        submitBtn.disabled = true;
-        voiceBtn.disabled = true;
-        return false;
-    }
-    return true;
+    return true; // Always return true - backend handles OpenAI
 }
 
 // Initialize voice recognition
@@ -241,124 +237,35 @@ async function processInput(input) {
     }
 }
 
-// Parse input using OpenAI ChatGPT
+// Parse input using backend API (which uses OpenAI)
 async function parseInputWithOpenAI(input) {
-    const apiKey = typeof OPENAI_API_KEY !== 'undefined' && OPENAI_API_KEY !== 'YOUR_OPENAI_API_KEY_HERE' 
-        ? OPENAI_API_KEY 
-        : null;
-
-    if (!apiKey) {
-        return { error: 'OpenAI API key not configured' };
-    }
-
-    const prompt = `You are an intelligent assistant that understands user intent and extracts structured data from natural language queries about finding places along a route.
-
-**CRITICAL INSTRUCTIONS:**
-1. **Understand intent, not just patterns** - Interpret what the user means, not just what they say literally
-2. **Extract adjective intelligently** - If the user mentions a specific type/cuisine/style, that's the adjective (e.g., "burger place" → adjective: "burger", "Italian restaurant" → adjective: "Italian")
-3. **Map place types to categories** - You MUST map the place type to one of these exact categories:
-   - "Restaurants" (for any food/dining place: restaurant, cafe, diner, fast food, etc.)
-   - "Petrol Pumps" (for gas stations, fuel stations, petrol stations)
-   - "Repair Store" (for auto repair, mechanic, service center, etc.)
-   - "Hospital" (for hospitals, medical centers, emergency rooms)
-   - "Pharmacy" (for pharmacies, drug stores, chemists)
-   - "Hotel / Motel" (for hotels, motels, lodges, inns)
-   - "Travel Points" (for airports, train stations, bus stations, transit hubs)
-   - "EV Charging Spots" (for electric vehicle charging stations)
-4. **Correct typos intelligently** - Fix spelling errors in all fields using your knowledge
-5. **Normalize destinations** - Correct and expand location names (e.g., "philly" → "Philadelphia", "NYC" → "New York")
-
-**Your task is to extract:**
-1. **adjective**: Any descriptive word, cuisine type, or modifier (e.g., "burger", "Indian", "cheap", "24-hour"). If no adjective is present, return null (not "none").
-2. **placeType**: MUST be one of the 8 categories listed above, exactly as written.
-3. **destination**: The destination location with correct, full spelling (city, state, or country name).
-
-**Examples:**
-- "burger place on my way to philly" → adjective: "burger", placeType: "Restaurants", destination: "Philadelphia"
-- "Find me an Indian restaurant on my way to Delaware" → adjective: "Indian", placeType: "Restaurants", destination: "Delaware"
-- "I need a gas station on route to New York" → adjective: null, placeType: "Petrol Pumps", destination: "New York"
-- "Looking for a hospital to Boston" → adjective: null, placeType: "Hospital", destination: "Boston"
-- "Find cheap hotels on my way to LA" → adjective: "cheap", placeType: "Hotel / Motel", destination: "Los Angeles"
-- "Need an airport near San Francisco" → adjective: null, placeType: "Travel Points", destination: "San Francisco"
-- "EV charger on route to Seattle" → adjective: null, placeType: "EV Charging Spots", destination: "Seattle"
-- "McDonald's on my way to Chicago" → adjective: "McDonald's", placeType: "Restaurants", destination: "Chicago"
-- "Italian food to Miami" → adjective: "Italian", placeType: "Restaurants", destination: "Miami"
-
-**User query:** "${input}"
-
-**Respond ONLY with a valid JSON object in this exact format:**
-{
-  "adjective": "the adjective or null",
-  "placeType": "one of the 8 categories exactly as listed",
-  "destination": "the corrected destination location name"
-}
-
-**If the query is non-sensical, unclear, or doesn't contain a place type and destination, respond with:**
-{
-  "error": "Could not understand the query. Please provide a clearer request."
-}
-
-**Remember:** 
-- Use your intelligence to understand intent, not just match patterns
-- Map place types to the exact 8 categories listed
-- Return null (not "none") for adjective if absent
-- Correct all typos and normalize location names`;
-
+    // Backend API endpoint - change this to your production URL when deploying
+    const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+    
     try {
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        const response = await fetch(`${API_BASE_URL}/api/parse-input`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}`
             },
-            body: JSON.stringify({
-                model: 'gpt-4o-mini',
-                messages: [
-                    {
-                        role: 'system',
-                        content: 'You are an intelligent assistant that understands user intent and extracts structured data from natural language. You interpret what users mean, not just what they say. You correct typos, normalize place types to the 8 specified categories, and intelligently extract adjectives. Return null for adjective if none exists. Always respond with valid JSON only.'
-                    },
-                    {
-                        role: 'user',
-                        content: prompt
-                    }
-                ],
-                temperature: 0.2,
-                max_tokens: 200
-            })
+            body: JSON.stringify({ input })
         });
 
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
-            throw new Error(errorData.error?.message || `API error: ${response.status}`);
+            throw new Error(errorData.error || `API error: ${response.status}`);
         }
 
-        const data = await response.json();
-        const content = data.choices[0].message.content.trim();
+        const parsed = await response.json();
         
-        // Parse JSON response
-        try {
-            const parsed = JSON.parse(content);
-            // Handle case where API returns string "null" instead of actual null
-            if (parsed.adjective === 'none' || parsed.adjective === 'null' || parsed.adjective === '') {
-                parsed.adjective = null;
-            }
-            return parsed;
-        } catch (parseError) {
-            // Try to extract JSON from markdown code blocks if present
-            const jsonMatch = content.match(/```(?:json)?\s*(\{[\s\S]*\})\s*```/);
-            if (jsonMatch) {
-                const parsed = JSON.parse(jsonMatch[1]);
-                // Handle case where API returns string "null" instead of actual null
-                if (parsed.adjective === 'none' || parsed.adjective === 'null' || parsed.adjective === '') {
-                    parsed.adjective = null;
-                }
-                return parsed;
-            }
-            throw new Error('Invalid response format from AI');
+        // Handle case where API returns string "null" instead of actual null
+        if (parsed.adjective === 'none' || parsed.adjective === 'null' || parsed.adjective === '') {
+            parsed.adjective = null;
         }
+        
+        return parsed;
     } catch (error) {
-        console.error('OpenAI API error:', error);
+        console.error('Backend API error:', error);
         return { error: error.message || 'Failed to parse input. Please try again.' };
     }
 }

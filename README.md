@@ -10,14 +10,32 @@ A web app that helps users find points of interest along their driving route.
 npm install
 ```
 
-### 2. Configure API Keys
+### 2. Configure Backend API Keys
 
-Open `config.js` and add your API keys:
+1. Copy the example environment file:
+   ```bash
+   cp .env.example .env
+   ```
 
-```javascript
-const ELEVENLABS_API_KEY = 'your-elevenlabs-api-key-here';
-const OPENAI_API_KEY = 'your-openai-api-key-here';
-```
+2. Open `.env` and add your API keys (this file is in `.gitignore` and won't be committed):
+   ```env
+   OPENAI_API_KEY=your-openai-api-key-here
+   ELEVENLABS_API_KEY=your-elevenlabs-api-key-here
+   PORT=3001
+   ```
+
+### 3. Configure Frontend (Supabase)
+
+1. Copy the example config file:
+   ```bash
+   cp config.example.js config.js
+   ```
+
+2. Open `config.js` and add your Supabase keys (only Supabase anon key needed in frontend):
+   ```javascript
+   const SUPABASE_URL = 'your-supabase-url';
+   const SUPABASE_ANON_KEY = 'your-supabase-anon-key';
+   ```
 
 #### Getting API Keys:
 
@@ -31,15 +49,32 @@ const OPENAI_API_KEY = 'your-openai-api-key-here';
 1. Go to [https://platform.openai.com/api-keys](https://platform.openai.com/api-keys)
 2. Sign up or log in
 3. Create a new API key
-4. Copy the key (you won't be able to see it again!)
+4. Copy the key and add it to `.env` file
 
-### 3. Run the App
+**Supabase API Key:**
+1. Go to [https://supabase.com/dashboard](https://supabase.com/dashboard)
+2. Select your project
+3. Go to Settings → API
+4. Copy the **anon public** key (NOT the secret key!)
+5. Add it to `config.js`
 
+### 4. Run the App
+
+**Option 1: Run both frontend and backend together (recommended):**
 ```bash
+npm run dev:all
+```
+
+**Option 2: Run separately:**
+```bash
+# Terminal 1 - Backend server
+npm run dev:server
+
+# Terminal 2 - Frontend
 npm run dev
 ```
 
-The app will open at `http://localhost:3000`
+The frontend will open at `http://localhost:3000` and the backend API will run on `http://localhost:3001`
 
 ## How It Works
 

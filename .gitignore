@@ -7,9 +7,11 @@ dist/
 # Environment variables
 .env
 .env.local
+.env.*
+!.env.example
 
-# Note: config.js is kept in repo with placeholder values
-# In production, use environment variables or a backend server
+# API Keys - NEVER commit these!
+config.js
 
 # IDE
 .vscode/
