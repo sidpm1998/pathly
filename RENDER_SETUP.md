@@ -26,9 +26,13 @@ Click "Environment" tab and add:
 NODE_ENV=production
 OPENAI_API_KEY=your-openai-api-key-here
 GOOGLE_MAPS_API_KEY=your-google-maps-api-key-here
+SUPABASE_URL=your-supabase-url-here
+SUPABASE_ANON_KEY=your-supabase-anon-key-here
 ```
 
-**Note:** Render automatically sets the `PORT` environment variable, so you don't need to set it manually.
+**Note:** 
+- Render automatically sets the `PORT` environment variable, so you don't need to set it manually.
+- The `config.js` file will be automatically generated from `SUPABASE_URL`, `SUPABASE_ANON_KEY`, and `GOOGLE_MAPS_API_KEY` environment variables.
 
 ### 5. Deploy
 1. Click "Create Web Service"
@@ -38,20 +42,18 @@ GOOGLE_MAPS_API_KEY=your-google-maps-api-key-here
    - Start the server (`npm start`)
 3. Wait for deployment to complete (~5-10 minutes first time)
 
-### 6. Create config.js on Render
+### 6. Add Frontend Environment Variables
 After deployment, you'll get a URL like `https://pathly-xxxx.onrender.com`
 
-**Important:** You need to create `config.js` file on Render's file system:
+**Important:** Add these environment variables in Render for the frontend config:
 1. Go to your Render service dashboard
-2. Click on "Shell" tab (or use SSH)
-3. Create `config.js` file with your Supabase keys:
-   ```javascript
-   const SUPABASE_URL = 'your-supabase-url';
-   const SUPABASE_ANON_KEY = 'your-supabase-anon-key';
-   const GOOGLE_MAPS_API_KEY = 'your-google-maps-api-key';
-   ```
+2. Click on "Environment" tab
+3. Add these environment variables:
+   - `SUPABASE_URL` = your Supabase URL
+   - `SUPABASE_ANON_KEY` = your Supabase anon key
+   - `GOOGLE_MAPS_API_KEY` = your Google Maps API key
 
-**Alternative:** You can also add these as environment variables and create config.js during build (see advanced setup below).
+The server will automatically generate `config.js` from these environment variables at runtime. No need to manually create the file!
 
 The app will automatically use the same origin for API calls in production.
 
@@ -68,9 +70,13 @@ The app will automatically use the same origin for API calls in production.
 ### Required:
 - `OPENAI_API_KEY` - Your OpenAI API key
 - `GOOGLE_MAPS_API_KEY` - Your Google Maps API key
+- `SUPABASE_URL` - Your Supabase project URL
+- `SUPABASE_ANON_KEY` - Your Supabase anonymous/public key (safe for frontend)
 - `NODE_ENV=production` - Tells the app it's in production (optional - auto-set if PORT is set)
 
-**Note:** `PORT` is automatically set by Render - you don't need to configure it.
+**Note:** 
+- `PORT` is automatically set by Render - you don't need to configure it.
+- The frontend `config.js` file is automatically generated from `SUPABASE_URL`, `SUPABASE_ANON_KEY`, and `GOOGLE_MAPS_API_KEY` at runtime.
 
 ### Optional:
 - `FRONTEND_URL` - Your Render URL (for CORS, if needed)

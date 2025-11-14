@@ -560,17 +560,26 @@ app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', message: 'Server is running' });
 });
 
+// Serve config.js dynamically from environment variables (works in both dev and production)
+app.get('/config.js', (req, res) => {
+    const supabaseUrl = process.env.SUPABASE_URL || '';
+    const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || '';
+    const googleMapsApiKey = process.env.GOOGLE_MAPS_API_KEY || '';
+    
+    const configContent = `// Auto-generated config.js from environment variables
+const SUPABASE_URL = '${supabaseUrl}';
+const SUPABASE_ANON_KEY = '${supabaseAnonKey}';
+const GOOGLE_MAPS_API_KEY = '${googleMapsApiKey}';
+`;
+    
+    res.type('application/javascript');
+    res.send(configContent);
+});
+
 // Serve static files in production (after building frontend)
 if (process.env.NODE_ENV === 'production') {
     const distPath = join(__dirname, 'dist');
     app.use(express.static(distPath));
-    
-    // Also serve config.js from root (for runtime loading)
-    app.get('/config.js', (req, res) => {
-        const configPath = join(__dirname, 'config.js');
-        res.type('application/javascript');
-        res.sendFile(configPath);
-    });
     
     // Serve index.html for all non-API routes
     app.get('*', (req, res, next) => {
