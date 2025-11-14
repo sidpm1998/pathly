@@ -20,6 +20,7 @@ npm install
 2. Open `.env` and add your API keys (this file is in `.gitignore` and won't be committed):
    ```env
    OPENAI_API_KEY=your-openai-api-key-here
+   GOOGLE_MAPS_API_KEY=your-google-maps-api-key-here
    ELEVENLABS_API_KEY=your-elevenlabs-api-key-here
    PORT=3001
    ```
@@ -50,6 +51,16 @@ npm install
 2. Sign up or log in
 3. Create a new API key
 4. Copy the key and add it to `.env` file
+
+**Google Maps API Key:**
+1. Go to [https://console.cloud.google.com/google/maps-apis](https://console.cloud.google.com/google/maps-apis)
+2. Create a project or select an existing one
+3. Enable these APIs:
+   - Places API (Text Search)
+   - Geocoding API
+   - Directions API
+4. Go to Credentials → Create Credentials → API Key
+5. Copy the key and add it to `.env` file as `GOOGLE_MAPS_API_KEY`
 
 **Supabase API Key:**
 1. Go to [https://supabase.com/dashboard](https://supabase.com/dashboard)

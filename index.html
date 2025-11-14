@@ -3,97 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pathly - Location Finder</title>
+    <title>Pathly</title>
     <link rel="stylesheet" href="styles.css">
     <script src="config.js"></script>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>📍 Pathly</h1>
-            <p class="subtitle">Find points of interest along your route</p>
-        </header>
+    <!-- Header -->
+    <header class="app-header">
+        <div class="header-content">
+            <h1 class="logo">Pathly</h1>
+        </div>
+    </header>
 
-        <main>
-            <div class="location-card">
-                <!-- Input Section -->
-                <div class="input-section">
-                    <div class="input-hint">
-                        <span class="hint-icon">💡</span>
-                        <p>Try: <strong>"Find me an Indian restaurant on my way to Delaware"</strong></p>
-                    </div>
-                    
-                    <div class="input-container">
-                        <input 
-                            type="text" 
-                            id="textInput" 
-                            class="text-input" 
-                            placeholder="Find me a [place] on my way to [destination]"
-                        />
-                        <button id="voiceBtn" class="btn-voice" title="Voice Input">
-                            <span class="voice-icon">🎤</span>
-                        </button>
-                        <button id="submitBtn" class="btn-submit">
-                            Search
-                        </button>
-                    </div>
-                    
-                    <div id="voiceStatus" class="voice-status hidden">
-                        <span class="pulse-dot"></span>
-                        <span>Listening...</span>
-                    </div>
-                </div>
-
-                <div id="status" class="status-message"></div>
-                
-                <!-- Parsed Variables Display -->
-                <div id="parsedInfo" class="parsed-info hidden">
-                    <h3>Search Details</h3>
-                    <div class="parsed-grid">
-                        <div class="parsed-item">
-                            <label>Adjective:</label>
-                            <span id="adjective">-</span>
-                        </div>
-                        <div class="parsed-item">
-                            <label>Place Type:</label>
-                            <span id="placeType">-</span>
-                        </div>
-                        <div class="parsed-item">
-                            <label>Destination:</label>
-                            <span id="destination">-</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="locationInfo" class="location-info hidden">
-                    <h2>📍 Your Current Location</h2>
-                    <div class="info-grid">
-                        <div class="info-item">
-                            <label>Latitude:</label>
-                            <span id="latitude">-</span>
-                        </div>
-                        <div class="info-item">
-                            <label>Longitude:</label>
-                            <span id="longitude">-</span>
-                        </div>
-                        <div class="info-item">
-                            <label>Accuracy:</label>
-                            <span id="accuracy">-</span>
-                        </div>
-                        <div class="info-item">
-                            <label>Timestamp:</label>
-                            <span id="timestamp">-</span>
-                        </div>
-                    </div>
-                    <div id="mapContainer" class="map-container">
-                        <div id="map" class="map"></div>
-                    </div>
+    <!-- Main Content Area -->
+    <main class="chat-container">
+        <div class="chat-messages" id="chatMessages">
+            <!-- Welcome message -->
+            <div class="message assistant-message">
+                <div class="message-content">
+                    <p>Tap the microphone button and say: "Find me a [place] on my way to [destination]"</p>
+                    <p style="margin-top: 8px; font-size: 13px; opacity: 0.8;">Example: "Find me an Indian restaurant on my way to Delaware"</p>
                 </div>
             </div>
-        </main>
+        </div>
+    </main>
+
+    <!-- Input Bar (Fixed at Bottom) -->
+    <div class="input-bar-container">
+        <div id="voiceStatus" class="voice-status hidden">
+            <span class="pulse-dot"></span>
+            <span>LISTENING... SPEAK NOW</span>
+        </div>
+        <div class="input-bar">
+            <button id="voiceBtn" class="btn-voice btn-voice-centered" title="Tap to speak">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                    <line x1="12" y1="19" x2="12" y2="23"></line>
+                    <line x1="8" y1="23" x2="16" y2="23"></line>
+                </svg>
+            </button>
+            <input 
+                type="text" 
+                id="textInput" 
+                class="text-input hidden"
+                placeholder="Find me a [place] on my way to [destination]"
+            />
+            <button id="submitBtn" class="btn-send hidden" title="Send">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+            </button>
+        </div>
     </div>
 
     <script type="module" src="app.js"></script>
 </body>
 </html>
-

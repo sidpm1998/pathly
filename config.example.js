@@ -12,3 +12,8 @@
 const SUPABASE_URL = 'YOUR_SUPABASE_URL_HERE';
 const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY_HERE';
 
+// Google Maps API Key
+// Get your API key from: https://console.cloud.google.com/google/maps-apis
+// Enable "Places API", "Geocoding API", and "Directions API"
+const GOOGLE_MAPS_API_KEY = 'YOUR_GOOGLE_MAPS_API_KEY_HERE';
+
