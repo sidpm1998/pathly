@@ -29,7 +29,10 @@ if (process.env.GOOGLE_MAPS_API_KEY) {
 }
 
 // Middleware
-app.use(cors());
+app.use(cors({
+    origin: process.env.FRONTEND_URL || '*', // Allow all origins in dev, set specific in production
+    credentials: true
+}));
 app.use(express.json());
 
 // Parse user input using OpenAI
@@ -367,16 +370,16 @@ app.post('/api/generate-summary', async (req, res) => {
             return `${index + 1}. ${name} - Rating: ${rating} stars, ${timeMinutes} minutes away`;
         }).join('\n');
 
-        const prompt = `Create a very brief voice summary of these top 3 restaurants. 
-For each restaurant, mention ONLY: name, rating, and time to location.
-Keep it extremely concise - one short sentence per restaurant maximum.
+        const prompt = `Create an extremely brief voice summary of these top 3 restaurants. 
+For each restaurant, mention ONLY: name, rating, and time. Nothing else.
+Keep it as short as possible - just the essential facts.
 
 Restaurants:
 ${restaurantDetails}
 
-Example format: "First, [name] with [rating] stars, [time] minutes away. Second, [name] with [rating] stars, [time] minutes away. Third, [name] with [rating] stars, [time] minutes away."
+Format exactly like this: "First, [name], [rating] stars, [time] minutes. Second, [name], [rating] stars, [time] minutes. Third, [name], [rating] stars, [time] minutes."
 
-Keep it short and natural to speak.`;
+No extra words. Just name, rating, time.`;
 
         const response = await fetch('https://api.openai.com/v1/chat/completions', {
             method: 'POST',
@@ -389,15 +392,15 @@ Keep it short and natural to speak.`;
                 messages: [
                     {
                         role: 'system',
-                        content: 'You are a helpful assistant that creates concise, natural-sounding voice summaries. Your summaries are conversational and flow well when spoken aloud.'
+                        content: 'You are a helpful assistant that creates extremely brief voice summaries. Include ONLY name, rating, and time. No extra words or descriptions. Be as concise as possible.'
                     },
                     {
                         role: 'user',
                         content: prompt
                     }
                 ],
-                temperature: 0.7,
-                max_tokens: 300
+                temperature: 0.3,
+                max_tokens: 150
             })
         });
 
@@ -552,9 +555,20 @@ app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', message: 'Server is running' });
 });
 
+// Serve static files in production (after building frontend)
+if (process.env.NODE_ENV === 'production') {
+    app.use(express.static(join(__dirname, 'dist')));
+    app.get('*', (req, res) => {
+        res.sendFile(join(__dirname, 'dist', 'index.html'));
+    });
+}
+
 // Start server
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Server running on http://localhost:${PORT}`);
     console.log(`📝 API endpoint: http://localhost:${PORT}/api/parse-input`);
+    if (process.env.NODE_ENV === 'production') {
+        console.log(`🌐 Serving frontend from /dist`);
+    }
 });
 

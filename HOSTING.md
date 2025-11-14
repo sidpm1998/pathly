@@ -1,0 +1,230 @@
+# Hosting Guide for Pathly
+
+This guide covers hosting options for your full-stack application (frontend + backend).
+
+## Recommended Solutions
+
+### Option 1: Railway (Easiest - Recommended) ⭐
+
+**Best for:** Full-stack apps, easy setup, free tier available
+
+**Pros:**
+- Deploys both frontend and backend together
+- Automatic HTTPS
+- Environment variables management
+- Free tier: $5 credit/month
+- Easy database connections
+
+**Setup:**
+1. Go to [railway.app](https://railway.app)
+2. Sign up with GitHub
+3. Click "New Project" → "Deploy from GitHub repo"
+4. Select your `pathly` repository
+5. Railway will auto-detect it's a Node.js app
+6. Add environment variables in Railway dashboard:
+   - `OPENAI_API_KEY`
+   - `GOOGLE_MAPS_API_KEY`
+   - `PORT` (optional, defaults to 3001)
+7. Railway will give you a URL like `https://your-app.railway.app`
+
+**Configuration needed:**
+- Update `vite.config.js` to set `VITE_API_URL` to your Railway backend URL
+- Update frontend `config.js` with your Supabase keys (these are safe, they're public keys)
+
+**Cost:** Free tier available, then ~$5-10/month
+
+---
+
+### Option 2: Render (Free Tier Available)
+
+**Best for:** Budget-friendly, good free tier
+
+**Pros:**
+- Free tier available (spins down after inactivity)
+- Easy setup
+- Automatic SSL
+- Environment variables
+
+**Setup:**
+1. Go to [render.com](https://render.com)
+2. Sign up with GitHub
+3. Create a new "Web Service"
+4. Connect your GitHub repo
+5. Settings:
+   - **Build Command:** `npm install`
+   - **Start Command:** `npm run dev:all` (or separate services)
+6. Add environment variables in dashboard
+7. Render provides a URL like `https://your-app.onrender.com`
+
+**Note:** Free tier spins down after 15 min inactivity (first request will be slow)
+
+**Cost:** Free tier available, paid starts at $7/month
+
+---
+
+### Option 3: Vercel (Frontend) + Railway/Render (Backend)
+
+**Best for:** Best performance, separate scaling
+
+**Frontend on Vercel:**
+1. Go to [vercel.com](https://vercel.com)
+2. Import your GitHub repo
+3. Vercel auto-detects Vite
+4. Add environment variable: `VITE_API_URL` = your backend URL
+5. Deploy
+
+**Backend on Railway/Render:**
+- Follow Option 1 or 2 above for backend
+
+**Pros:**
+- Vercel has excellent CDN for frontend
+- Can scale frontend and backend independently
+- Vercel free tier is generous
+
+**Cost:** Both have free tiers
+
+---
+
+### Option 4: Fly.io
+
+**Best for:** Global distribution, Docker support
+
+**Setup:**
+1. Install Fly CLI: `iwr https://fly.io/install.ps1 -useb | iex`
+2. Run `fly launch`
+3. Follow prompts
+4. Add secrets: `fly secrets set OPENAI_API_KEY=xxx GOOGLE_MAPS_API_KEY=xxx`
+
+**Cost:** Free tier available
+
+---
+
+## Quick Setup for Railway (Recommended)
+
+### Step 1: Prepare for Deployment
+
+1. **Create `railway.json` (optional):**
+```json
+{
+  "$schema": "https://railway.app/railway.schema.json",
+  "build": {
+    "builder": "NIXPACKS"
+  },
+  "deploy": {
+    "startCommand": "npm run dev:all",
+    "restartPolicyType": "ON_FAILURE",
+    "restartPolicyMaxRetries": 10
+  }
+}
+```
+
+2. **Update `vite.config.js` for production:**
+```javascript
+export default defineConfig({
+  server: {
+    port: 3000,
+    proxy: {
+      '/api': {
+        target: process.env.VITE_API_URL || 'http://localhost:3001',
+        changeOrigin: true,
+      },
+    },
+  },
+  // ... rest of config
+});
+```
+
+3. **Create `Procfile` (for some platforms):**
+```
+web: npm run dev:all
+```
+
+### Step 2: Deploy to Railway
+
+1. Sign up at [railway.app](https://railway.app)
+2. New Project → Deploy from GitHub
+3. Select your repo
+4. Add environment variables:
+   - `OPENAI_API_KEY`
+   - `GOOGLE_MAPS_API_KEY`
+   - `PORT=3001`
+5. Railway will auto-deploy
+
+### Step 3: Update Frontend Config
+
+After deployment, you'll get a backend URL. Update your frontend:
+
+1. In Railway, copy your backend URL (e.g., `https://pathly-backend.railway.app`)
+2. Update `vite.config.js` or set environment variable:
+   - `VITE_API_URL=https://pathly-backend.railway.app`
+
+### Step 4: Deploy Frontend (if separate)
+
+If using Vercel for frontend:
+1. Import repo to Vercel
+2. Add environment variable: `VITE_API_URL=your-backend-url`
+3. Deploy
+
+---
+
+## Environment Variables Checklist
+
+### Backend (.env):
+- `OPENAI_API_KEY`
+- `GOOGLE_MAPS_API_KEY`
+- `PORT` (optional)
+
+### Frontend (config.js - safe to commit public keys):
+- `SUPABASE_URL`
+- `SUPABASE_ANON_KEY`
+- `GOOGLE_MAPS_API_KEY` (if needed client-side)
+
+---
+
+## CORS Configuration
+
+If frontend and backend are on different domains, update `server.js`:
+
+```javascript
+app.use(cors({
+  origin: ['https://your-frontend-domain.com', 'http://localhost:3000'],
+  credentials: true
+}));
+```
+
+---
+
+## Recommended: Railway (All-in-One)
+
+**Why Railway:**
+- ✅ Easiest setup
+- ✅ Handles both frontend and backend
+- ✅ Free tier available
+- ✅ Automatic HTTPS
+- ✅ Environment variable management
+- ✅ GitHub integration
+
+**Quick Start:**
+1. Visit [railway.app](https://railway.app)
+2. Sign up with GitHub
+3. Deploy from your repo
+4. Add environment variables
+5. Done!
+
+---
+
+## Alternative: Free Hosting Combo
+
+**Frontend:** Vercel (free, fast CDN)
+**Backend:** Render (free tier, or Railway)
+
+This gives you the best of both worlds with free tiers.
+
+---
+
+## Need Help?
+
+- Railway Docs: https://docs.railway.app
+- Render Docs: https://render.com/docs
+- Vercel Docs: https://vercel.com/docs
+
