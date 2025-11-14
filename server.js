@@ -13,6 +13,11 @@ const __dirname = dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// Set production mode if PORT is set (Render sets this automatically)
+if (process.env.PORT && !process.env.NODE_ENV) {
+    process.env.NODE_ENV = 'production';
+}
+
 // Debug: Check if API keys are loaded (don't log the actual keys)
 if (process.env.OPENAI_API_KEY) {
     console.log('✅ OpenAI API key loaded successfully');
@@ -557,9 +562,16 @@ app.get('/api/health', (req, res) => {
 
 // Serve static files in production (after building frontend)
 if (process.env.NODE_ENV === 'production') {
-    app.use(express.static(join(__dirname, 'dist')));
-    app.get('*', (req, res) => {
-        res.sendFile(join(__dirname, 'dist', 'index.html'));
+    const distPath = join(__dirname, 'dist');
+    app.use(express.static(distPath));
+    
+    // Serve index.html for all non-API routes
+    app.get('*', (req, res, next) => {
+        // Don't serve index.html for API routes
+        if (req.path.startsWith('/api')) {
+            return next();
+        }
+        res.sendFile(join(distPath, 'index.html'));
     });
 }
 

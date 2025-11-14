@@ -261,8 +261,8 @@ async function processInput(input) {
 
 // Parse input using backend API (which uses OpenAI)
 async function parseInputWithOpenAI(input) {
-    // Backend API endpoint - change this to your production URL when deploying
-    const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+    // Backend API endpoint - uses same origin in production, localhost in dev
+    const API_BASE_URL = import.meta.env.VITE_API_URL || (window.location.origin);
     
     try {
         const response = await fetch(`${API_BASE_URL}/api/parse-input`, {
@@ -717,7 +717,7 @@ async function narrateResults(top3Places, startLat, startLng, endLocationCoords)
         }));
 
         // Generate summary via backend
-        const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+        const API_BASE_URL = import.meta.env.VITE_API_URL || (window.location.origin);
         const response = await fetch(`${API_BASE_URL}/api/generate-summary`, {
             method: 'POST',
             headers: {
@@ -992,7 +992,7 @@ async function identifySelectedRestaurant(userInput, top3Places) {
         console.log('Identifying restaurant from input:', userInput);
         console.log('Available restaurants:', restaurants.map(r => `${r.index}. ${r.name}`));
 
-        const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+        const API_BASE_URL = import.meta.env.VITE_API_URL || (window.location.origin);
         const response = await fetch(`${API_BASE_URL}/api/identify-restaurant`, {
             method: 'POST',
             headers: {

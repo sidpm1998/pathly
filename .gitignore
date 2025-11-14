@@ -3,6 +3,7 @@ node_modules/
 
 # Build output
 dist/
+# But keep dist in git for Render (or remove this line if you want to build on Render)
 
 # Environment variables
 .env
